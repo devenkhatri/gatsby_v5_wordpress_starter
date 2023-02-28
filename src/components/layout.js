@@ -6,25 +6,35 @@
  */
 
 import * as React from "react"
-import { useStaticQuery, graphql } from "gatsby" 
+import { useStaticQuery, graphql } from "gatsby"
 
 import Header from "./header"
 import "./layout.css"
+import Navbar from "./Navbar"
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title, description }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
         siteMetadata {
           title
+          description
+        }
+      }
+      wordpress {
+        generalSettings {
+          title
+          description
         }
       }
     }
   `)
 
+  const siteTitle = data.wordpress?.generalSettings?.title || data.site.siteMetadata?.title || `Title`;
+  const siteDescription = data.wordpress?.generalSettings?.description || data.site.siteMetadata?.description
   return (
     <>
-      <Header siteTitle={data.site.siteMetadata?.title || `Title`} />      
+      <Header siteTitle={siteTitle} />
       <div
         style={{
           margin: `0 auto`,
@@ -32,6 +42,10 @@ const Layout = ({ children }) => {
           padding: `var(--size-gutter)`,
         }}
       >
+        <div style={{ paddingBottom: "3rem" }}>
+          <div style={{ fontSize: "2rem" }}><b>{siteTitle}</b></div>
+          <div>{siteDescription}</div>
+        </div>
         <main>{children}</main>
         <footer
           style={{
@@ -39,9 +53,8 @@ const Layout = ({ children }) => {
             fontSize: `var(--font-sm)`,
           }}
         >
-          © {new Date().getFullYear()} &middot; Built with
-          {` `}
-          <a href="https://www.gatsbyjs.com">Gatsby</a>
+          © {new Date().getFullYear()} &middot; Built with Gatsby
+          <Navbar />
         </footer>
       </div>
     </>
